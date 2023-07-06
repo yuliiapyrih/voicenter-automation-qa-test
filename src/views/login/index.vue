@@ -55,7 +55,7 @@
                     Login
                 </h2>
             </div>
-            <form class="mt-8 px-10 xl:p-0">
+            <form @submit="login" class="mt-8 px-10 xl:p-0">
                 <label class="block">
                     <span class="text-md font-medium text-brand-main"
                         >E-mail</span
@@ -63,6 +63,7 @@
                     <input
                         v-model="state.email.value"
                         type="email"
+                        @input="clearApiValidation"
                         class="
                             focus:outline-none focus:border-brand-main
                             text-gray-400
@@ -100,6 +101,7 @@
                     >
                     <input
                         v-model="state.password.value"
+                        @input="clearApiValidation"
                         type="password"
                         :class="{
                             'border-brand-danger': state.password.errorMessage,
@@ -171,13 +173,15 @@
                     </button>
                 </div>
             </form>
+            <p v-if="state.apiErrorMessage" class="font-medium text-sm text-brand-danger px-10">
+                {{ state.apiErrorMessage }}
+            </p>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
 import { reactive } from 'vue'
-
 import { useField } from 'vee-validate'
 
 import {
@@ -186,38 +190,51 @@ import {
 } from '../../utils/validators'
 
 import { useRouter } from 'vue-router'
+import { loginUser } from '../../api/login'
+import { loginData } from '../../state/login'
 
-export default {
-    name: 'Home',
+const router = useRouter()
+const { value: emailValue, errorMessage: emailErrorMessage } = useField(
+    'email',
+    validateEmptyAndEmail
+)
+const { value: passwordValue, errorMessage: passwordErrorMessage } =
+    useField('password', validateEmptyAndLength3)
 
-    setup() {
-        const router = useRouter()
+const state = reactive({
+    apiErrorMessage: null,
+    hasErrors: false,
+    isLoading: false,
+    email: {
+        value: emailValue,
+        errorMessage: emailErrorMessage,
+    },
+    password: {
+        value: passwordValue,
+        errorMessage: passwordErrorMessage,
+    },
+})
 
-        const { value: emailValue, errorMessage: emailErrorMessage } = useField(
-            'email',
-            validateEmptyAndEmail
-        )
+function clearApiValidation () {
+    state.apiErrorMessage = null
+}
 
-        const { value: passwordValue, errorMessage: passwordErrorMessage } =
-            useField('password', validateEmptyAndLength3)
+async function login (e) {
+    e.preventDefault()
 
-        const state = reactive({
-            hasErrors: false,
-            isLoading: false,
-            email: {
-                value: emailValue,
-                errorMessage: emailErrorMessage,
-            },
-            password: {
-                value: passwordValue,
-                errorMessage: passwordErrorMessage,
-            },
+    try {
+        const { data } = await loginUser({
+            email: state.email.value,
+            password: state.password.value
         })
 
-        return {
-            state,
-        }
-    },
+        loginData.name = data.name
+        loginData.isLoggedIn = true
+
+        router.push('/')
+    } catch ({ response }) {
+        state.apiErrorMessage = response.data.message
+    }
 }
 </script>
 

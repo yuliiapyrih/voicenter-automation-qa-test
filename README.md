@@ -18,6 +18,10 @@ And open Cypress:
 ```
 yarn test
 ```
+
+Credentials:
+- **Email**: pespatron@gmail.com 
+- **Password**: vovaEbashYihBlat 
 ### 🔧 Good Luck!
 
 

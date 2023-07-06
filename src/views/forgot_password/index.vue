@@ -55,7 +55,18 @@
                   Відновити пароль
                 </h2>
             </div>
-            <form class="mt-8 px-10 xl:p-0">
+            <p
+                v-if="state.password"
+                class="
+                        text-center
+                        text-white
+                        tracking-normal
+                        xl:mt-5
+                    "
+            >
+                Пароль: <strong class="text-brand-main">{{ state.password }}</strong>
+            </p>
+            <form @submit="reset" class="mt-8 px-10 xl:p-0">
                 <label class="block">
                     <span class="text-md font-medium text-brand-main"
                         >E-mail</span
@@ -130,16 +141,19 @@
                         "
                     >
                         <span class="inline-block mr-2 text-base"
-                            >Відправити лист</span
+                            >Отримати пароль</span
                         >
                     </button>
                 </div>
             </form>
+            <p v-if="state.apiErrorMessage" class="font-medium text-sm text-brand-danger pb-5">
+                {{ state.apiErrorMessage }}
+            </p>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
 import { reactive } from 'vue'
 
 import { useField } from 'vee-validate'
@@ -150,38 +164,40 @@ import {
 } from '../../utils/validators'
 
 import { useRouter } from 'vue-router'
+import {loginUser, resetPassword} from "../../api/login";
+import {loginData} from "../../state/login";
 
-export default {
-    name: 'Home',
+const router = useRouter()
 
-    setup() {
-        const router = useRouter()
+const { value: emailValue, errorMessage: emailErrorMessage } = useField(
+    'email',
+    validateEmptyAndEmail
+)
 
-        const { value: emailValue, errorMessage: emailErrorMessage } = useField(
-            'email',
-            validateEmptyAndEmail
-        )
+const { value: passwordValue, errorMessage: passwordErrorMessage } =
+    useField('password', validateEmptyAndLength3)
 
-        const { value: passwordValue, errorMessage: passwordErrorMessage } =
-            useField('password', validateEmptyAndLength3)
-
-        const state = reactive({
-            hasErrors: false,
-            isLoading: false,
-            email: {
-                value: emailValue,
-                errorMessage: emailErrorMessage,
-            },
-            password: {
-                value: passwordValue,
-                errorMessage: passwordErrorMessage,
-            },
-        })
-
-        return {
-            state,
-        }
+const state = reactive({
+    apiErrorMessage: null,
+    hasErrors: false,
+    isLoading: false,
+    email: {
+        value: emailValue,
+        errorMessage: emailErrorMessage,
     },
+    password: null,
+})
+
+async function reset (e) {
+    e.preventDefault()
+
+    try {
+        const { data } = await resetPassword(state.email.value)
+
+        state.password = data.password
+    } catch ({ response }) {
+        state.apiErrorMessage = response.data.message
+    }
 }
 </script>
 
