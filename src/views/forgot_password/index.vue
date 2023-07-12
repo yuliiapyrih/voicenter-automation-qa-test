@@ -57,6 +57,7 @@
             </div>
             <p
                 v-if="state.password"
+                data-cy="password-forgot-password"
                 class="
                         text-center
                         text-white
@@ -73,6 +74,7 @@
                     >
                     <input
                         v-model="state.email.value"
+                        data-cy="email-forgot-password"
                         type="email"
                         :class="{
                             'border-brand-danger': state.email.errorMessage,
@@ -109,6 +111,7 @@
                     <div class="text-sm text-right">
                         <router-link
                             :to="{ path: '/login' }"
+                            data-cy="return-to-login-link"
                             class="font-medium text-brand-main underline-custom"
                             >Повернутися до входу?</router-link
                         >
@@ -118,6 +121,7 @@
                 <div class="w-full xl:pb-6 mt-5">
                     <button
                         type="submit"
+                        data-cy="submit-forgot-password"
                         class="
                             m-auto
                             w-full

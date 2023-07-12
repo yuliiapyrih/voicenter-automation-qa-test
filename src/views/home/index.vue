@@ -10,7 +10,7 @@
             md:py-0
         "
     >
-        <h1 class="text-white text-2xl">
+        <h1 class="text-white text-2xl" data-cy="username">
             Hello my dear friend, <strong class="text-pink-500">{{ loginData.name }}</strong>
         </h1>
     </div>

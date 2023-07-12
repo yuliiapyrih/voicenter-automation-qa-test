@@ -62,6 +62,7 @@
                     >
                     <input
                         v-model="state.email.value"
+                        data-cy="email-login"
                         type="email"
                         @input="clearApiValidation"
                         class="
@@ -101,6 +102,7 @@
                     >
                     <input
                         v-model="state.password.value"
+                        data-cy="password-login"
                         @input="clearApiValidation"
                         type="password"
                         :class="{
@@ -138,6 +140,7 @@
                     <div class="text-sm text-right">
                         <router-link
                             :to="{ path: '/forgot_password' }"
+                            data-cy="forgot-password-link"
                             class="font-medium text-brand-main underline-custom"
                             >Забули свій пароль?</router-link
                         >
@@ -146,6 +149,7 @@
 
                 <div class="w-full xl:pb-6 mt-5">
                     <button
+                        data-cy="submit-login-btn"
                         type="submit"
                         class="
                             m-auto
